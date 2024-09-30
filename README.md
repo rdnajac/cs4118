@@ -1,5 +1,4 @@
-cs4118 Recitations
-==================
+# cs4118 Recitations
 
 This repository contains the recitation notes for Columbia's Operating Systems I
 class, COMSW4118, as taught by Jae Woo Lee. For information about the class,
@@ -12,8 +11,9 @@ Issues, patches, and comments, especially by current and former students, are
 welcome.
 
 ### Contents
+
 - [Note A](A-Workflow/workflow.md): VM/kernel workflow setup, Linux source code
-  navigators  
+  navigators
 - [Note B](B-Sockets-ServerTesting): Sockets/TCP programming, server testing
   strategies
 - [Note C](C-Linux-Kernel-Dev/linux-kernel-dev.md): Kernel configuration,
@@ -24,4 +24,3 @@ welcome.
 - [Note F](F-Farfetchd/index.md): Linux page table data structures,
   macros/functions (hw7)
 - [Note G](G-Pantry): Linux page cache, implementing a file system (hw8)
-  

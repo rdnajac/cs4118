@@ -15,9 +15,9 @@ scheduler in the Linux kernel. The assignment is known to leave relatively
 competent programmers in shambles. I don't blame them; the seemingly simple task
 of writing a round robin scheduler is complicated by two confounding factors:
 
-* The Linux scheduler is cryptic as hell and on top of that, very poorly
+- The Linux scheduler is cryptic as hell and on top of that, very poorly
   documented.
-* Bugs in scheduler code will often trigger a kernel panic, freezing the system
+- Bugs in scheduler code will often trigger a kernel panic, freezing the system
   without providing any logs or meaningful error messages.
 
 I hope to ease students' suffering by addressing the first bullet point. In this
@@ -63,12 +63,12 @@ upon to schedule tasks. So, to hide the complexity of the scheduler, it is
 invoked with a simple and well-defined API. The scheduler - from the perspective
 of the rest of the kernel - has two main responsibilities:
 
-* **Responsibility I**: Provide an interface to halt the currently running
-process and switch to a new one. To do so, the scheduler must pick the next
-process to run, which is a nontrivial problem.
+- **Responsibility I**: Provide an interface to halt the currently running
+  process and switch to a new one. To do so, the scheduler must pick the next
+  process to run, which is a nontrivial problem.
 
-* **Responsibility II**: Indicate to the rest of the OS when a new process
-should be run.
+- **Responsibility II**: Indicate to the rest of the OS when a new process
+  should be run.
 
 ### Responsibility I: Switching to the Next Process
 
@@ -102,9 +102,9 @@ above more or less describes the very first Linux runqueue. But over the years,
 the scheduler evolved to incorporate multiple scheduling algorithms. These
 include:
 
-  * Completely Fair Scheduler (CFS)
-  * Real-Time Scheduler
-  * Deadline Scheduler
+- Completely Fair Scheduler (CFS)
+- Real-Time Scheduler
+- Deadline Scheduler
 
 The modern-day runqueue is no longer a linked list but actually a collection of
 algorithm-specific runqueues corresponding to the list above. Indeed,
@@ -136,9 +136,9 @@ a process might voluntarily go to sleep, waiting for an IO event or lock. To do
 this, the process puts itself on a "wait queue" and takes itself off the
 runqueue. In this case, the process has **yielded** the CPU. In summary:
 
-* "preemption" is when a process is forcibly kicked off the CPU.
+- "preemption" is when a process is forcibly kicked off the CPU.
 
-* "yielding" is when a process voluntarily gives up the CPU.
+- "yielding" is when a process voluntarily gives up the CPU.
 
 In addition to an expired timeslice, there are several other reasons that
 preemption may occur. For example, when an interrupt occurs, the CPU may be
@@ -191,7 +191,7 @@ Figure 1, `pick_next_task()` would return the `task_struct` for Process 2. Then,
 ## Responsibility II: When Should the Next Process Run?
 
 Great, so we've seen that `schedule()` is used to context switch to the next
-task. But when does this *actually* happen?
+task. But when does this _actually_ happen?
 
 As mentioned previously, a user-space program might voluntarily go to sleep
 waiting for an IO event or a lock. In this case, the kernel will call
@@ -263,9 +263,9 @@ keeps a count of how many spinlocks the currently running process has acquired.
 When that count goes down to 0, the kernel knows that it's okay to put the
 process to sleep. The kernel checks the `need_resched` flag in two main places:
 
-* when returning from an interrupt handler
+- when returning from an interrupt handler
 
-* when returning to user-space from a system call
+- when returning to user-space from a system call
 
 If `need_resched` is `True` and the spinlock count is 0, then the kernel calls
 `schedule()`. With our simple linked-list runqueue, this delayed invocation of
@@ -358,32 +358,32 @@ remove a task from the runqueue, respectively.
 
 These functions are called for a variety of reasons:
 
-* When a child process is first forked, `enqueue_task()` is called to put it on
+- When a child process is first forked, `enqueue_task()` is called to put it on
   a runqueue. When a process exits, `dequeue_task()` takes it off the runqueue.
 
-* When a process goes to sleep, `dequeue_task()` takes it off the runqueue. For
+- When a process goes to sleep, `dequeue_task()` takes it off the runqueue. For
   example, this happens when the process needs to wait for a lock or IO event.
   When the IO event occurs, or the lock becomes available, the process wakes up.
   It must then be re-enqueued with `enqueue_task()`.
 
-* Process migration - if a process must be migrated from one CPU's runqueue to
+- Process migration - if a process must be migrated from one CPU's runqueue to
   another, it's dequeued from its old runqueue and enqueued on a different one
   using this function.
 
-* When `set_cpus_allowed()` is called to change the task's processor affinity,
+- When `set_cpus_allowed()` is called to change the task's processor affinity,
   it may need to be enqueued on a different CPU's runqueue.
 
-* When the priority of a process is boosted to avoid priority inversion. In this
+- When the priority of a process is boosted to avoid priority inversion. In this
   case, the task used to have a low-priority `sched_class`, but is being
   promoted to a `sched_class` with high priority. This action occurs in
   `rt_mutex_setprio()`.
 
-* From `__sched_setscheduler`. If a task's `sched_class` has changed, it's
+- From `__sched_setscheduler`. If a task's `sched_class` has changed, it's
   dequeued using its old `sched_class` and enqueued with the new one.
 
 Each of these functions are passed the task to be enqueued/dequeued, as well as
 the runqueue it should be added to/removed from. In addition, these functions
-are given a bit vector of flags that describe *why* enqueue or dequeue is being
+are given a bit vector of flags that describe _why_ enqueue or dequeue is being
 called. Here are the various flags, which are described in
 [sched.h](https://elixir.bootlin.com/linux/v5.10.158/source/kernel/sched/sched.h#L1743):
 
@@ -421,7 +421,7 @@ struct task_struct *pick_next_task(struct rq *rq);
 
 `pick_next_task()` is called by the core scheduler to determine which of `rq`'s
 tasks should be running. The name is a bit misleading: This function is not
-supposed to return the task that should run *after* the currently running task;
+supposed to return the task that should run _after_ the currently running task;
 instead, it's supposed to return the `task_struct` that should be running now,
 **in this instant.**
 
@@ -505,17 +505,17 @@ CPU that is returned by this function. CPU assignment obviously occurs when a
 process is first forked, but CPU reassignment can happen for a large variety of
 reasons. Here are some instances where `select_task_rq()` is called:
 
-* When a process is first forked.
+- When a process is first forked.
 
-* When a task is woken up after having gone to sleep.
+- When a task is woken up after having gone to sleep.
 
-* In response to any of the syscalls in the execv family. This is an
+- In response to any of the syscalls in the execv family. This is an
   optimization, since it doesn't hurt the cache to migrate a process that's
   about to call exec.
 
-* And many more places...
+- And many more places...
 
-You can check *why* `select_task_rq` was called by looking at `sd_flag`.
+You can check _why_ `select_task_rq` was called by looking at `sd_flag`.
 
 For instance, `sd_flag == SD_BALANCE_FORK` whenever `select_task_rq()` is called
 to determine the CPU of a newly forked task. You can find all possible values of
@@ -539,11 +539,11 @@ void set_next_task(struct rq *rq, struct task_struct *p, bool first);
 
 This function is called in the following instances:
 
-* When the current task's CPU affinity changes.
+- When the current task's CPU affinity changes.
 
-* When the current task's priority, nice value, or scheduling policy changes.
+- When the current task's priority, nice value, or scheduling policy changes.
 
-* When the current task's task group changes.
+- When the current task's task group changes.
 
 This function was previously called `set_curr_task()`, but was changed to better
 match `put_prev_task()`. Several scheduling policies also call `set_next_task()`
@@ -594,7 +594,7 @@ void check_preempt_curr(struct rq *rq, struct task_struct *p, int flags)
 		resched_curr(rq);
 
 	/* CODE OMITTED */
-}	
+}
 ```
 
 This handles both the case where the new task has a higher priority within a

@@ -1,10 +1,9 @@
-VM/Kernel Workflow
-==================
+# VM/Kernel Workflow
+
 Before we get into the heavier assignments in this course, you should invest
 sometime into setting up a workflow and develop good coding habits.
 
-Why Use a VM?
--------------
+## Why Use a VM?
 
 - Hypervisor: Software responsible for managing VMs (e.g. creation, deletion,
   resource allocation). In this class, we use VMware.
@@ -12,15 +11,15 @@ Why Use a VM?
 - Virtual machine (VM): A computer system created by the hypervisor that shares
   resources with the host machine. In this class, we virtualize Debian 11 (a
   flavor of Linux). VMs adhere to sandbox properties:
+
   - Isolate the work you'll be doing from the rest of the system
   - Be able to take snapshots of your development environment so that if it does
     get corrupted, you can revert to a clean state
-  
+
   Working on a VM can be preferable to working on your host machine (i.e.
   "bare-metal"). You can virtualize other operating systems to test your
   applications. You can work on potentially buggy/dangerous code without
   compromising your host machine.
-
 
 - Snapshot: A feature most hypervisors support. Capture the current running
   state of the VM, stores it, and then allows you to revert to that state
@@ -32,8 +31,8 @@ boot into those hacked kernels. We need to use VMs since not all of us have a
 Linux host machine. Even if we did, we wouldn't want to ruin our host machines
 with our potentially buggy kernels.
 
-VM Setup/Workflow
------------------
+## VM Setup/Workflow
+
 We've already written a series of guides for working on your VM.
 
 First and foremost, you should have a Debian VM installed already (see [Debian
@@ -41,13 +40,14 @@ VM Setup](https://cs4118.github.io/dev-guides/debian-vm-setup.html) for a guide
 on how to do this).
 
 ### Working on your VM
+
 You have more options than simply working on the VM's graphical interface, which
 often feels clunky.
 
 The most common workflow involves SSHing into your VM, which we've written a
 [guide](https://cs4118.github.io/dev-guides/vm-ssh.html#ssh-into-your-local-vm)
 for. This is a good option if you want to conserve processing power on your host
-machine and disable the VM's graphical interface. 
+machine and disable the VM's graphical interface.
 
 Alternatively, you can setup an IDE to SSH into your VM. One option is using
 Visual Studio Code, which we've written up some notes (below) on how to use.
@@ -55,6 +55,7 @@ This is a nice alternative to command-line editors like vim/emacs if you're
 not familiar with them.
 
 ### Additional Tools
+
 If you do decide to work in a command-line environment, here are some tools
 we've used to streamline our workflow:
 
@@ -67,8 +68,7 @@ we've used to streamline our workflow:
 - `tmux`: Terminal multiplexer. (e.g. open 2 panes for vim, 1 for `dmesg`, 1 for
   running commands).
 
-Kernel Workflow
----------------
+## Kernel Workflow
 
 ### Editor enhancements
 

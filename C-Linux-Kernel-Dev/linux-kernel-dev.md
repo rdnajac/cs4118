@@ -1,11 +1,11 @@
-Linux Kernel Development
-========================
+# Linux Kernel Development
+
 This document is meant to supplement our [compilation
 guide](https://cs4118.github.io/dev-guides/debian-kernel-compilation.html),
 which goes over how to install a new kernel on your machine.
 
-Kernel Module Makefile
-----------------------
+## Kernel Module Makefile
+
 More info in our [kernel module
 guide](https://cs4118.github.io/dev-guides/linux-modules.html), but for the sake
 of comparison, here it is again:
@@ -23,8 +23,7 @@ to work with. Here, we're adding to the `obj-m` "goal definition" (build object
 as module) and using a specialized Makefile located at `/lib/modules/$(shell
 uname -r)/build` to link our module into the kernel.
 
-Top-level Kernel Makefile
--------------------------
+## Top-level Kernel Makefile
 
 `linux/Makefile` is the only Makefile you'll be executing when developing with
 the kernel. At a high level, this Makefile is responsible for:
@@ -138,8 +137,7 @@ subsequent times, `install` is sufficient.
 Finally, reboot and select the kernel version you just installed via the GRUB
 menu!
 
-Kernel Code Style
------------------
+## Kernel Code Style
 
 The kernel source comes with a linter written in Perl (located at
 `linux/scripts/checkpatch.pl`).
@@ -152,8 +150,7 @@ If you want a general overview of kernel code style, here's
 [one](https://www.kernel.org/doc/html/v5.10/process/coding-style.html). You can
 also find this in `linux/Documentation/process/coding-style.rst`.
 
-Debugging Techniques
---------------------
+## Debugging Techniques
 
 - Take
   [snapshots](https://docs.vmware.com/en/VMware-Fusion/12/com.vmware.fusion.using.doc/GUID-4C90933D-A31F-4A56-B5CA-58D3AE6E93CF.html)

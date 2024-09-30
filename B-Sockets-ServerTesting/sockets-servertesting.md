@@ -3,6 +3,7 @@
 ## Sockets and HTTP
 
 ### What is a socket?
+
 A socket is a software construct used for many modes of communication between
 processes. The mode of communication that this recitation will focus on is
 network communication. In particular, stream sockets represent an endpoint for
@@ -11,6 +12,7 @@ processes, on separate computers, to communicate over a TCP/IP network
 connection.
 
 Sockets have:
+
 - an IP address, to (typically) identify the computer that the socket endpoint
   belongs to
 - a port number, to identify which process running on the computer the socket
@@ -18,25 +20,29 @@ Sockets have:
 - a protocol, such as TCP (reliable) or UDP (unreliable). Stream sockets use TCP
 
 An IP address and port number are both required in order for a computer to
-communicate with a specific process on a remote computer. 
+communicate with a specific process on a remote computer.
 
 ### The client-server model
+
 The two endpoints in a socket connection serve different roles. One end acts as
-a *server*: 
+a _server_:
+
 - It tells the operating system that it should receive incoming connections on a
   port number
 - It waits for incoming connections
-- When it receives a connection, it creates a *new socket* for each client,
+- When it receives a connection, it creates a _new socket_ for each client,
   which will then be used to communicate with that client
 
-The other end is a *client*:
+The other end is a _client_:
+
 - It "connects" to the server using the server’s IP address and the port number
 
 After a client connects to a server, there is bidirectional communication
 between the two processes, often with I/O system calls such as `read()` and
-`write()`, or their socket-specific variants `recv()` and `send()`. 
+`write()`, or their socket-specific variants `recv()` and `send()`.
 
 ### Sockets with netcat
+
 A simple way to demonstrate the bidirectional and network-based communcation of
 sockets is with `netcat`. `netcat` is a bare-bones program to send streams of
 binary data over the network.
@@ -71,42 +77,50 @@ computer). This asymmetry is the client-server model.
 After the client connects to the server, the server `netcat` process creates a
 new socket for bidirectional communicaiton. After the two processes connect
 there is no functional difference between client and server. What you type on
-one end should be visible on the other -- a full duplex stream of data. 
+one end should be visible on the other -- a full duplex stream of data.
 
 ### Sockets API Summary
-![](img/client-server.png) 
+
+![](img/client-server.png)
 
 **`socket()`**
+
 - Called by both the client and the server
 - On the server-side, a listening socket is created; a connected socket will be
   created later by `accept()`
 
 **`bind()`**
+
 - Usually called only by the server
 - Binds the listening socket to a specific port that should be known to the
   client
 
 **`listen()`**
+
 - Called only by the server
 - Sets up the listening socket to accept connections
 
 **`accept()`**
+
 - Called only by the server
 - By default blocks until a connection request arrives
 - Creates and returns a new socket for each client
 
 **`connect()`**
+
 - Called only by the client
 - Requires an IP address and port number to connect to
 - Attempt to establish connection by reaching out to server
 
 **`send()` and `recv()`**
+
 - Called by both the client and server
 - Reads and writes to the other side
 - Message boundaries may not be preserved
 - nearly the same as `write()` and `read()`, but with socket-specific options
 
 A TCP client may use these functions as such:
+
 ```c
 int fd = socket(...);
 connect(fd, ... /* server address */);
@@ -135,19 +149,22 @@ for (;;) {
 ```
 
 ### Listening socket vs connected socket
+
 ![](img/listening-vs-connecting.png)
 
 To form a bidirectional channel between client and server, three sockets are used:
+
 - The server uses two sockets
   - The listening socket, to accept incoming connections from a client
   - The client socket, which is created when an incoming connection has been
-    `accept()`ed. 
+    `accept()`ed.
 - The client uses one socket
   - The `connect()`ing socket, which reaches out to the server. Once the
-  connection has been made, communication can be done between the server's client
-  socket and the client's connecting socket.
+    connection has been made, communication can be done between the server's client
+    socket and the client's connecting socket.
 
 ### HTTP 1.0
+
 HTTP 1.0 is a protocol between a client, typically a web browser, and a server,
 typically a web server hosting files such as HTML. It is an outdated version of
 the HTTP protocol and simpler than newer versions.
@@ -173,27 +190,29 @@ requests:
 - The server sends an **HTTP response**
 
 **HTTP request**
+
 - First line: method, request URI, version
-    - Ex: "GET /index.html HTTP/1.0\r\n"
+  - Ex: "GET /index.html HTTP/1.0\r\n"
 - Followed by 0 or more headers
-    - Ex: "Host: www.google.com\r\n"
+  - Ex: "Host: www.google.com\r\n"
 - Followed by an empty line
-    - "\r\n"
+  - "\r\n"
 
 **HTTP response**
+
 - First line: response status
-    - Success: "HTTP/1.0 200 OK\r\n"
-    - Failure: "HTTP/1.0 404 Not Found\r\n"
+  - Success: "HTTP/1.0 200 OK\r\n"
+  - Failure: "HTTP/1.0 404 Not Found\r\n"
 - Followed by 0 or more response headers
 - Followed by an empty line
-    - "\r\n"
+  - "\r\n"
 - Followed by the content of the response
-    - Ex: image file or HTML file
+  - Ex: image file or HTML file
 
 We can see the contents of real HTTP requests using `netcat` by pretending to be
 either a web client or server. Our client and server won't actually work, since
 they simply recieve the incoming request but do nothing to process the request
-or reply. 
+or reply.
 
 Let's first act as a web server. We tell `netcat` to open a server connection
 with `nc -l 10000`, and then in a web browser navigate to the URL with the
@@ -237,6 +256,7 @@ Content-Type: text/html     # more headers...
 ## Testing your multi-server
 
 ### Siege
+
 Siege is a command-line tool that allows you to benchmark your webserver using
 load testing. Given a few parameters, Siege gives you information about the
 number of successful transactions to your website, percent availability, the
@@ -272,9 +292,10 @@ siege -c 25 -r 50 http://<hostname>:<port>/<URI>
 There are many other options, specified in the siege man page. These include
 `-t`, which specifies how long each user should run (as opposed to how many
 times), and `-f`, which specifies a file path that contains a list of URLs to
-test. 
+test.
 
 ### Additional guidance on testing/benchmarking
+
 When grading, we're going to test your implementation using a mix of manual
 connections (e.g. using tools like netcat) and stress testers like siege.
 
@@ -308,8 +329,8 @@ since you are testing multi-server in a virtual machine, the performance isn’t
 guaranteed to be significantly better. As such, don’t worry too much about the
 benchmarking instructions - it’s not a hard and fast requirement.
 
-
 ## Acknowledgements
+
 - Some examples were taken from John Hui's [Advanced
   Programming](https://cs3157.github.io/www/2022-9/) lecture notes. We recommend
   reading them on top of these recitation notes.

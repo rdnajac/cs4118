@@ -1,4 +1,5 @@
 # Understanding Page Tables in Linux
+
 The goal of this recitation is to provide a high-level overview of x86/arm64 paging as
 well as the data structures and functions the Linux kernel uses to manipulate
 page tables.
@@ -19,6 +20,7 @@ corresponding physical address or mapped to no address at all in cases where the
 kernel swapped out a page or never allocated one in the first place.
 
 ## The shape of a page table
+
 Recall that the structure of the page table is rigidly specified by the CPU
 architecture. This is necessary since the CPU hardware directly traverses the
 page table to transparently map virtual addresses to physical addresses. The
@@ -58,9 +60,9 @@ Diagram: P4  -> P3  -> P2  -> P1  -> page frame
 Linux:   PGD -> PUD -> PMD -> PTE -> page frame
 ```
 
-Each entry in the P4 table is the address of a *different* P3 table such that
+Each entry in the P4 table is the address of a _different_ P3 table such that
 each page table can have up to 512 different P3 tables. In turn, each entry in a
-P3 table points to a different P2 table such that there are 512 * 512 = 262,144
+P3 table points to a different P2 table such that there are 512 \* 512 = 262,144
 P2 tables. Since most of the virtual address space is unused for a given
 process, the kernel does not allocate frames for most of the intermediary tables
 comprising the page table.
@@ -84,10 +86,12 @@ above corresponds to an entry in the P1 table. A similar but slightly different
 set of flags exists for the intermediary entries as well.
 
 ## Working with page tables in Linux
+
 In this section we'll take a look at the data structures and functions the Linux
 kernel defines to manage page tables.
 
 ### The fifth level of Dante's page table
+
 We just finished discussing 4-level page tables, but Linux actually implements
 5-level paging and exposes a 5-level paging interface, even when the kernel is
 built with 5-level paging disabled. Luckily 5-level paging is similar to the
@@ -102,7 +106,7 @@ Diagram Above
     P4  -> P3  -> P2  -> P1  -> page frame
 Linux
     PGD -> PUD -> PMD -> PTE -> page frame
-    
+
 5-Level Paging (current)
 Linux
     PGD -> P4D -> PUD -> PMD -> PTE -> page frame
@@ -161,9 +165,11 @@ static inline p4dval_t native_p4d_val(p4d_t p4d)
 }
 #endif
 ```
+
 [x86 Source](https://elixir.bootlin.com/linux/v5.10.158/source/arch/x86/include/asm/pgtable_types.h#L332)
 
 Interesting. Looking at `pgtable-nop4d.h` we find that `p4d_t` is defined as
+
 ```
 typedef struct { pgd_t pgd; } p4d_t;
 ```
@@ -187,6 +193,7 @@ implementation must work correctly for any page table configuration and
 therefore must use the macros defined by the kernel.
 
 ### Data structures, functions, and macros
+
 In this section we'll take a step back and discuss the data structures
 and functions the kernel uses to manage page tables in more detail.
 
@@ -212,13 +219,12 @@ However, it's easy to recover the physical address since all kernel addresses
 are linearly mapped to physical addresses. `virt_to_phys` recovers the physical
 address using this linear mapping.
 
-
 Section 3.3 in Gordman's [chapter on page table
 management](https://www.kernel.org/doc/gorman/html/understand/understand006.html)
 provides a good overview of the functions / macros used to navigate the page table.
 
 A common source of confusion arises from a misunderstanding of what macros like `pud_offset`
-return. 
+return.
 
 ```C
 /* Find an entry in the third-level page table.. */
@@ -259,6 +265,7 @@ both x86 and arm64, it just may look slightly different depending which architec
 which function/macros you choose.
 
 ### Page dirty and refcount
+
 Recall from before that a flag in the page table entry indicates whether the
 page frame is dirty or not. Do not read the flag directly; the kernel provides
 a macro for this purpose.
@@ -269,4 +276,3 @@ the kernel, which is defined
 [here](https://elixir.bootlin.com/linux/v5.10.158/source/include/linux/mm_types.h#L70).
 Be sure to use the correct kernel functions / macros to access any information
 in `struct page`.
-
